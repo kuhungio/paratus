@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from paratus.BaseModel import BaseModel
 
@@ -109,35 +110,68 @@ class FeatureScaler(BaseModel):
         return X*(self._maxs - self._mins) + self._mins
 
 
+class MultiOneHotEncoder(BaseModel):
+    def __init__(self, features_to_encode):
+        self._features_to_encode = features_to_encode
+        self._value_int_dict = dict()
+        self._int_value_dict = dict()
+
+    def fit(self, X):
+        for feature in self._features_to_encode:
+            self._int_value_dict[feature] = dict(
+                enumerate(np.unique(X[feature])))
+            self._value_int_dict[feature] = dict(
+                [(y, x) for (x, y) in enumerate(np.unique(X[feature]))])
+
+    def transform(self, X):
+        keep = [c for c in X.columns if c not in self._features_to_encode]
+        df = X[keep].copy()
+        for feature in self._features_to_encode:
+            d = self._value_int_dict[feature]
+            for v in d:
+                df['{}_{}'.format(feature, d[v])] = (
+                    X[feature] == v).astype(int)
+        return df
+
+    def inverse_transform(self, X):
+        raise Exception("Not implemented")
+
+
 if __name__ == "__main__":
-    encoder = LabelSetTransformer()
-    encoder.fit(np.array([
-        [1, 2, 3],
-        [2, 4],
-        [3]
-    ]))
+    # encoder = LabelSetTransformer()
+    # encoder.fit(np.array([
+    #     [1, 2, 3],
+    #     [2, 4],
+    #     [3]
+    # ]))
 
-    print(encoder.transform([[1, 6, 4], [2]]))
-    print(encoder.inverse_transform(encoder.transform([[1, 6, 4], [2]])))
+    # print(encoder.transform([[1, 6, 4], [2]]))
+    # print(encoder.inverse_transform(encoder.transform([[1, 6, 4], [2]])))
 
-    seq = SequenceTransformer(8)
-    print(seq.fit_transform(np.array([
-        [1, 2, 2, 1],
-        [0, 1, 1, 0],
-        [0, 1, 2, 1, 0]
-    ])))
+    # seq = SequenceTransformer(8)
+    # print(seq.fit_transform(np.array([
+    #     [1, 2, 2, 1],
+    #     [0, 1, 1, 0],
+    #     [0, 1, 2, 1, 0]
+    # ])))
 
-    print(seq.inverse_transform(seq.fit_transform(np.array([
-        [1, 2, 2, 1],
-        [0, 1, 1, 0],
-        [0, 1, 2, 1, 0]
-    ]))))
+    # print(seq.inverse_transform(seq.fit_transform(np.array([
+    #     [1, 2, 2, 1],
+    #     [0, 1, 1, 0],
+    #     [0, 1, 2, 1, 0]
+    # ]))))
 
-    f = FeatureScaler()
-    print(f.fit_transform(
-        np.array([[1, 5, 7], [3, 4, 7], [6, 6, 7]])))
-    print(f.inverse_transform(f.transform(
-        np.array([[1, 5, 7], [3, 4, 7], [6, 6, 7]]))))
+    # f = FeatureScaler()
+    # print(f.fit_transform(
+    #     np.array([[1, 5, 7], [3, 4, 7], [6, 6, 7]])))
+    # print(f.inverse_transform(f.transform(
+    #     np.array([[1, 5, 7], [3, 4, 7], [6, 6, 7]]))))
 
-    print(FeatureScaler().fit_transform(
-        np.array([[]])))
+    # print(FeatureScaler().fit_transform(
+    #     np.array([[]])))
+
+    df2 = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 5, 9]]), columns=['a', 'b', 'c'])
+
+    oneHot = MultiOneHotEncoder(['a', 'c'])
+    print(oneHot.fit_transform(df2))
