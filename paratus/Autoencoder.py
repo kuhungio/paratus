@@ -24,16 +24,19 @@ class Autoencoder(BaseModel):
             #                           verbose=1, save_best_only=True)
         ]
 
-    def fit(self, X):
+    def fit(self, X, y=None):
+        if y is None:
+            y = X
         shape = X.shape
         n_features = shape[1]
+        output_n_features = y.shape[1]
         self._batch_size
         inputs = layers.Input(
             shape=(n_features,), name='autoencoder_input')
         pre = self._pre_embedding(inputs)
         embedding = self._embedding_layer(pre)
         post = self._post_embedding
-        output = layers.Dense(n_features, name='output',
+        output = layers.Dense(output_n_features, name='output',
                               activation=self._output_activation)
         output_layer = output(post(embedding))
         self.trainer = models.Model(
@@ -52,11 +55,11 @@ class Autoencoder(BaseModel):
         #self.trainer.add_loss(self._loss(inputs, output_layer))
         self.trainer.compile(optimizer='rmsprop', loss=self._loss())
         print(X.shape)
-        self._history = self.trainer.fit(X, X,
+        self._history = self.trainer.fit(X, y,
                                          epochs=self._epochs,
                                          batch_size=self._batch_size,
                                          shuffle=True,
-                                         validation_split=0.2,
+                                         validation_split=0.3,
                                          callbacks=self._callbacks)
         # self.trainer.load_weights(self._model_tmp_path)
 
@@ -101,5 +104,6 @@ class Autoencoder(BaseModel):
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
+        plt.yscale('log')
         plt.legend(['train', 'test'], loc='upper left')
         plt.show()
