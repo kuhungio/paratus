@@ -5,10 +5,11 @@ from paratus.Autoencoder import Autoencoder
 
 
 class VariationalAutoencoder(Autoencoder):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, embedding_size,  *args, rmse_loss=False, **kwargs):
         self.z_mean = None
         self.z_log_var = None
-        return super().__init__(*args, **kwargs)
+        self._rmse_loss = rmse_loss
+        return super().__init__(embedding_size, *args, **kwargs)
 
     def _embedding_layer(self, input_layer):
         def _sampling(args):
@@ -21,8 +22,10 @@ class VariationalAutoencoder(Autoencoder):
         return layers.Lambda(lambda x: _sampling(x), output_shape=(self.embedding_size,))([self.z_mean, self.z_log_var])
 
     def _loss(self):
+        print("---->", self._rmse_loss)
+
         def loss(y_true, y_pred):
-            if False:  # args.mse:
+            if self._rmse_loss:
                 reconstruction_loss = losses.mse(y_true, y_pred)
             else:
                 reconstruction_loss = losses.binary_crossentropy(
@@ -33,8 +36,5 @@ class VariationalAutoencoder(Autoencoder):
                 K.square(self.z_mean) - K.exp(self.z_log_var)
             kl_loss = K.sum(kl_loss, axis=-1)
             kl_loss *= -0.5
-            print("--->", K.mean(reconstruction_loss + kl_loss))
             return K.mean(reconstruction_loss + kl_loss)
         return loss
-
-# https://blog.keras.io/building-autoencoders-in-keras.html
