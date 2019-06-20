@@ -5,10 +5,10 @@ from paratus.Autoencoder import Autoencoder
 
 
 class VariationalAutoencoder(Autoencoder):
-    def __init__(self, embedding_size,  *args, rmse_loss=False, **kwargs):
+    def __init__(self, embedding_size,  *args, mse_loss=False, **kwargs):
         self.z_mean = None
         self.z_log_var = None
-        self._rmse_loss = rmse_loss
+        self._mse_loss = mse_loss
         return super().__init__(embedding_size, *args, **kwargs)
 
     def _embedding_layer(self, input_layer):
@@ -22,10 +22,8 @@ class VariationalAutoencoder(Autoencoder):
         return layers.Lambda(lambda x: _sampling(x), output_shape=(self.embedding_size,))([self.z_mean, self.z_log_var])
 
     def _loss(self):
-        print("---->", self._rmse_loss)
-
         def loss(y_true, y_pred):
-            if self._rmse_loss:
+            if self._mse_loss:
                 reconstruction_loss = losses.mse(y_true, y_pred)
             else:
                 reconstruction_loss = losses.binary_crossentropy(
