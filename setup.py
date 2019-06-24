@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='paratus',
       version='0.1',
@@ -6,10 +6,14 @@ setup(name='paratus',
       url='https://github.com/jaume-ferrarons/paratus',
       author='Jaume Ferrarons',
       author_email='',
-      packages=['paratus'],
+      packages=find_packages(),
       install_requires=[
           'matplotlib>=3.0.3',
           'numpy>=1.9.1',
           'tensorflow>=1.12.0'
       ],
+      extras_require={
+          'tests': ['pytest',
+                    'pytest-cov'],
+      },
       zip_safe=False)

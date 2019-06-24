@@ -1,7 +1,7 @@
 from tensorflow.keras import layers, losses
 from tensorflow.keras import backend as K
 
-from paratus.Autoencoder import Autoencoder
+from paratus.autoencoder import Autoencoder
 
 
 class VariationalAutoencoder(Autoencoder):

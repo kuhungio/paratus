@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from paratus.BaseModel import BaseModel
+from paratus.baseModel import BaseModel
 
 
 class LabelSetTransformer:
@@ -138,16 +138,6 @@ class MultiOneHotEncoder(BaseModel):
 
 
 if __name__ == "__main__":
-    # encoder = LabelSetTransformer()
-    # encoder.fit(np.array([
-    #     [1, 2, 3],
-    #     [2, 4],
-    #     [3]
-    # ]))
-
-    # print(encoder.transform([[1, 6, 4], [2]]))
-    # print(encoder.inverse_transform(encoder.transform([[1, 6, 4], [2]])))
-
     # seq = SequenceTransformer(8)
     # print(seq.fit_transform(np.array([
     #     [1, 2, 2, 1],

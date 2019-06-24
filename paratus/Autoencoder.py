@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import layers, losses, callbacks, models
 import matplotlib.pyplot as plt
 
-from paratus.BaseModel import BaseModel
+from paratus.baseModel import BaseModel
 
 
 class Autoencoder(BaseModel):
