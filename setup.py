@@ -10,6 +10,7 @@ setup(name='paratus',
       install_requires=[
           'matplotlib>=3.0.3',
           'numpy>=1.9.1',
+          'pandas>=0.24.2',
           'tensorflow>=1.12.0'
       ],
       extras_require={
