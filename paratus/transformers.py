@@ -118,10 +118,11 @@ class MultiOneHotEncoder(BaseModel):
 
     def fit(self, X):
         for feature in self._features_to_encode:
+            unique_values = X[feature].unique()
             self._int_value_dict[feature] = dict(
-                enumerate(np.unique(X[feature])))
+                enumerate(unique_values))
             self._value_int_dict[feature] = dict(
-                [(y, x) for (x, y) in enumerate(np.unique(X[feature]))])
+                [(y, x) for (x, y) in enumerate(unique_values)])
 
     def transform(self, X):
         keep = [c for c in X.columns if c not in self._features_to_encode]
@@ -129,17 +130,10 @@ class MultiOneHotEncoder(BaseModel):
         for feature in self._features_to_encode:
             d = self._value_int_dict[feature]
             for v in d:
-                df['{}_{}'.format(feature, d[v])] = (
-                    X[feature] == v).astype(int)
+                indices = pd.isna(X[feature]) if pd.isna(
+                    v) else X[feature] == v
+                df['{}_{}'.format(feature, d[v])] = indices.astype(int)
         return df
 
     def inverse_transform(self, X):
         raise Exception("Not implemented")
-
-
-if __name__ == "__main__":
-    df2 = pd.DataFrame(
-        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 5, 9]]), columns=['a', 'b', 'c'])
-
-    oneHot = MultiOneHotEncoder(['a', 'c'])
-    print(oneHot.fit_transform(df2))
