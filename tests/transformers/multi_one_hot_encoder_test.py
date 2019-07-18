@@ -64,7 +64,9 @@ def test_encode_string():
                 [8, 9, 0, 0, 1],
                 [5, 9, 1, 0, 0]
             ],
-            columns=['b', 'c', 'a_0', 'a_1', 'a_2'])
+            columns=['b', 'c', 'a_0', 'a_1', 'a_2']).astype({
+                'a_0': np.uint8, 'a_1': np.uint8, 'a_2': np.uint8
+            })
     )
 
 
@@ -82,4 +84,6 @@ def test_encode_missing_number():
         ["4", 6, 0, 1, 0],
         ["7", 9, 0, 0, 1],
         ["1", 9, 0, 1, 0]
-    ], columns=['a', 'c', 'b_0', 'b_1', 'b_2'])))
+    ], columns=['a', 'c', 'b_0', 'b_1', 'b_2']).astype({
+        'b_0': np.uint8, 'b_1': np.uint8, 'b_2': np.uint8
+    })))

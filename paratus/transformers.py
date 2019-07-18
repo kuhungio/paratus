@@ -132,7 +132,37 @@ class MultiOneHotEncoder(BaseModel):
             for v in d:
                 indices = pd.isna(X[feature]) if pd.isna(
                     v) else X[feature] == v
-                df['{}_{}'.format(feature, d[v])] = indices.astype(int)
+                df['{}_{}'.format(feature, d[v])] = indices.astype(np.uint8)
+        return df
+
+    def inverse_transform(self, X):
+        raise Exception("Not implemented")
+
+
+class MultiEncoder(BaseModel):
+    def __init__(self, features_to_encode):
+        self._features_to_encode = features_to_encode
+        self._value_int_dict = dict()
+        self._int_value_dict = dict()
+
+    def fit(self, X):
+        for feature in self._features_to_encode:
+            unique_values = X[feature].unique()
+            self._int_value_dict[feature] = dict(
+                enumerate(unique_values))
+            self._value_int_dict[feature] = dict(
+                [(y, x) for (x, y) in enumerate(unique_values)])
+
+    def transform(self, X):
+        keep = [c for c in X.columns if c not in self._features_to_encode]
+        df = X[keep].copy()
+        for feature in self._features_to_encode:
+            d = self._value_int_dict[feature]
+            df[feature] = 0
+            for v in d:
+                indices = pd.isna(X[feature]) if pd.isna(
+                    v) else X[feature] == v
+                df.loc[indices, feature] = d[v] + 1
         return df
 
     def inverse_transform(self, X):
