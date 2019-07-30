@@ -140,29 +140,36 @@ class MultiOneHotEncoder(BaseModel):
 
 
 class MultiEncoder(BaseModel):
-    def __init__(self, features_to_encode):
+    def __init__(self, features_to_encode, min_frequency=1):
         self._features_to_encode = features_to_encode
+        self._min_frequency = min_frequency
+        self._low_frequency_encoding_value = -1
         self._value_int_dict = dict()
-        self._int_value_dict = dict()
 
     def fit(self, X):
         for feature in self._features_to_encode:
             unique_values = X[feature].unique()
-            self._int_value_dict[feature] = dict(
-                enumerate(unique_values))
+            counts = X[feature].value_counts()
+            values_to_encode = set(
+                counts[counts >= self._min_frequency].index.values.tolist())
             self._value_int_dict[feature] = dict(
-                [(y, x) for (x, y) in enumerate(unique_values)])
+                [(y, x + 1) for (x, y) in enumerate(sorted(values_to_encode))])
+            for v in unique_values:
+                if v not in values_to_encode and pd.notnull(v):
+                    self._value_int_dict[feature][v] = self._low_frequency_encoding_value
+            print(self._value_int_dict)
 
     def transform(self, X):
         keep = [c for c in X.columns if c not in self._features_to_encode]
         df = X[keep].copy()
         for feature in self._features_to_encode:
             d = self._value_int_dict[feature]
-            df[feature] = 0
+            df[feature] = 0  # NaNs encoded as 0
             for v in d:
                 indices = pd.isna(X[feature]) if pd.isna(
                     v) else X[feature] == v
-                df.loc[indices, feature] = d[v] + 1
+                df.loc[indices, feature] = d[v]
+            df[feature] = df[feature].astype('category')
         return df
 
     def inverse_transform(self, X):

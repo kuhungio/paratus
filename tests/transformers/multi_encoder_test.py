@@ -65,7 +65,7 @@ def test_encode_string():
                 [8, 9, 3],
                 [5, 9, 1]
             ],
-            columns=['b', 'c', 'a'])
+            columns=['b', 'c', 'a']).astype(transformed.dtypes)
     )
 
 
@@ -74,16 +74,18 @@ def test_encode_missing_number():
 
     transformed = model.fit_transform(data2)
 
+    print(transformed)
+
     assert (transformed.columns.values == [
         'a', 'c', 'b'
     ]).all()
 
     assert (transformed.equals(pd.DataFrame([
-        ["1", 3, 1],
-        ["4", 6, 2],
-        ["7", 9, 3],
-        ["1", 9, 2]
-    ], columns=['a', 'c', 'b'])))
+        ["1", 3, 0],
+        ["4", 6, 1],
+        ["7", 9, 2],
+        ["1", 9, 1]
+    ], columns=['a', 'c', 'b']).astype(transformed.dtypes)))
 
 
 def test_transform_new_values():
@@ -101,4 +103,21 @@ def test_transform_new_values():
         ["4", 6, 2],
         ["7", 9, 3],
         ["1", 9, 2]
-    ], columns=['a', 'c', 'b'])))
+    ], columns=['a', 'c', 'b']).astype(transformed.dtypes)))
+
+
+def test_encode_low_freq():
+    model = MultiEncoder(['c'], min_frequency=2)
+
+    transformed = model.fit_transform(data)
+
+    assert (transformed.columns.values == [
+        'a', 'b', 'c'
+    ]).all()
+
+    assert (transformed.values == np.array([
+        [1, 2, -1],
+        [4, 5, -1],
+        [7, 8, 1],
+        [1, 5, 1]
+    ])).all()
