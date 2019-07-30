@@ -157,7 +157,6 @@ class MultiEncoder(BaseModel):
             for v in unique_values:
                 if v not in values_to_encode and pd.notnull(v):
                     self._value_int_dict[feature][v] = self._low_frequency_encoding_value
-            print(self._value_int_dict)
 
     def transform(self, X):
         keep = [c for c in X.columns if c not in self._features_to_encode]
