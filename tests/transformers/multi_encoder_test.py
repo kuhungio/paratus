@@ -1,3 +1,4 @@
+import timeit
 import numpy as np
 import pandas as pd
 
@@ -121,3 +122,11 @@ def test_encode_low_freq():
         [7, 8, 1],
         [1, 5, 1]
     ])).all()
+
+
+def test_speed():
+    dataset = np.random.randint(0, 1000, 100000)
+    model = MultiEncoder(['c'], min_frequency=2)
+    df = pd.DataFrame(np.transpose(dataset), columns=['c'])
+    res = timeit.timeit(lambda: model.fit_transform(df), number=10)
+    assert(res < 10)

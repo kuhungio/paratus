@@ -144,7 +144,7 @@ class MultiEncoder(BaseModel):
         self._features_to_encode = features_to_encode
         self._min_frequency = min_frequency
         self._low_frequency_encoding_value = -1
-        self._value_int_dict = dict()
+        self._value_int_dict = {}
 
     def fit(self, X):
         for feature in self._features_to_encode:
@@ -152,8 +152,9 @@ class MultiEncoder(BaseModel):
             counts = X[feature].value_counts()
             values_to_encode = set(
                 counts[counts >= self._min_frequency].index.values.tolist())
-            self._value_int_dict[feature] = dict(
-                [(y, x + 1) for (x, y) in enumerate(sorted(values_to_encode))])
+            self._value_int_dict[feature] = {}
+            for x, y in enumerate(sorted(values_to_encode)):
+                self._value_int_dict[feature][y] = x + 1
             for v in unique_values:
                 if v not in values_to_encode and pd.notnull(v):
                     self._value_int_dict[feature][v] = self._low_frequency_encoding_value
@@ -163,11 +164,7 @@ class MultiEncoder(BaseModel):
         df = X[keep].copy()
         for feature in self._features_to_encode:
             d = self._value_int_dict[feature]
-            df[feature] = 0  # NaNs encoded as 0
-            for v in d:
-                indices = pd.isna(X[feature]) if pd.isna(
-                    v) else X[feature] == v
-                df.loc[indices, feature] = d[v]
+            df[feature] = [d[v] if v in d else 0 for v in X[feature]]
             df[feature] = df[feature].astype('category')
         return df
 
