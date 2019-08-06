@@ -39,8 +39,6 @@ def test_encode_two_columns():
         'c', 'b', 'a'
     ]).all()
 
-    print(transformed.values)
-
     assert (transformed.values == np.array([
         [3, 1, 1],
         [6, 2, 2],
@@ -74,8 +72,6 @@ def test_encode_missing_number():
     model = MultiEncoder(['b'])
 
     transformed = model.fit_transform(data2)
-
-    print(transformed)
 
     assert (transformed.columns.values == [
         'a', 'c', 'b'

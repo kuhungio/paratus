@@ -33,7 +33,6 @@ def test_encode_two_columns():
     model = MultiOneHotEncoder(['b', 'a'])
 
     transformed = model.fit_transform(data)
-    print(transformed.values)
 
     assert (transformed.columns.values == [
         'c', 'b_0', 'b_1', 'b_2', 'a_0', 'a_1', 'a_2'
