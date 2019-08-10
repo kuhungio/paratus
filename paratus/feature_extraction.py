@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import itertools
+from collections import Counter
 
 from paratus.baseModel import BaseModel
 
@@ -54,10 +55,11 @@ class FrequencyEncoding(BaseModel):
 
     def fit(self, X):
         for feature in self._features:
-            unique, counts = np.unique(X[feature], return_counts=True)
             length = len(X)
-            counts = [v/float(length) for v in counts]
-            self._feature_value_counts[feature] = dict(zip(unique, counts))
+            counts = dict(Counter(X[feature]))
+            for k in counts:
+                counts[k] /= length
+            self._feature_value_counts[feature] = counts
             self._feature_value_counts[feature][np.nan] = np.sum(
                 pd.isnull(X[feature]))/float(length)
 
