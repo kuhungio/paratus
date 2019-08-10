@@ -120,6 +120,23 @@ def test_encode_low_freq():
     ])).all()
 
 
+def test_encode_to_int():
+    model = MultiEncoder(['b'], as_category=False)
+
+    transformed = model.fit_transform(data2)
+
+    assert (transformed.columns.values == [
+        'a', 'c', 'b'
+    ]).all()
+
+    assert (transformed.equals(pd.DataFrame([
+        ["1", 3, 0],
+        ["4", 6, 1],
+        ["7", 9, 2],
+        ["1", 9, 1]
+    ], columns=['a', 'c', 'b'])))
+
+
 def test_speed():
     dataset = np.random.randint(0, 1000, 100000)
     model = MultiEncoder(['c'], min_frequency=2)

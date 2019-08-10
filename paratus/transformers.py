@@ -140,11 +140,12 @@ class MultiOneHotEncoder(BaseModel):
 
 
 class MultiEncoder(BaseModel):
-    def __init__(self, features_to_encode, min_frequency=1):
+    def __init__(self, features_to_encode, min_frequency=1, as_category=True):
         self._features_to_encode = features_to_encode
         self._min_frequency = min_frequency
         self._low_frequency_encoding_value = -1
         self._value_int_dict = {}
+        self._as_category = as_category
 
     def fit(self, X):
         for feature in self._features_to_encode:
@@ -165,7 +166,8 @@ class MultiEncoder(BaseModel):
         for feature in self._features_to_encode:
             d = self._value_int_dict[feature]
             df[feature] = [d[v] if v in d else 0 for v in X[feature]]
-            df[feature] = df[feature].astype('category')
+            if self._as_category:
+                df[feature] = df[feature].astype('category')
         return df
 
     def inverse_transform(self, X):
