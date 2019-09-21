@@ -13,6 +13,7 @@ Paratus is a high-level toolset for Machine Learning.
     * Data scaler
     * Label set encoder
     * Sequence of labels transformers
+    * Cyclical feature encoding
 
 ## Installation
 > pip install -U git+https://github.com/jaume-ferrarons/paratus

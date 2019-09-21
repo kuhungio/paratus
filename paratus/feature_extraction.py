@@ -90,3 +90,41 @@ class FrequencyEncoding(BaseModel):
 
     def inverse_transform(self, X):
         raise Exception("Not implemented")
+
+
+class CyclicalEncoder(BaseModel):
+    def __init__(self, cyclical_features, prefix="cyc"):
+        self._features = cyclical_features
+        self._prefix = prefix
+        self._feature_stats = {}
+
+    def fit(self, X):
+        for feature in self._features:
+            self._feature_stats[feature] = {
+                'min': np.min(X[feature]),
+                'max': np.max(X[feature]) + 1
+            }
+
+    def transform(self, X):
+        res = X.copy()
+        for f in self._features:
+            feature_x = self._get_column_name(f, 'x')
+            feature_y = self._get_column_name(f, 'y')
+            stats = self._feature_stats[f]
+            scale = stats['max'] - stats['min']
+            res[feature_x] = np.cos((X[f] - stats['min']) * 2 * np.pi / scale)
+            res[feature_y] = np.sin((X[f] - stats['min']) * 2 * np.pi / scale)
+        return res
+
+    def get_new_column_names(self):
+        res = []
+        for f in self._features:
+            res.append(self._get_column_name(f, 'x'))
+            res.append(self._get_column_name(f, 'y'))
+        return res
+
+    def _get_column_name(self, feature, axis):
+        return "{}_{}_{}".format(self._prefix, '_'.join(map(str, feature)), axis)
+
+    def inverse_transform(self, X):
+        raise Exception("Not implemented")
