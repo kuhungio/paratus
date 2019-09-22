@@ -13,14 +13,11 @@ data2 = pd.DataFrame(
 
 
 def test_encode_one_column():
-    model = MultiOneHotEncoder(['b'])
-
+    model = MultiOneHotEncoder(['b'], drop=None)
     transformed = model.fit_transform(data)
-
     assert (transformed.columns.values == [
         'a', 'c', 'b_0', 'b_1', 'b_2'
     ]).all()
-
     assert (transformed.values == np.array([
         [1, 3, 1, 0, 0],
         [4, 6, 0, 1, 0],
@@ -29,15 +26,26 @@ def test_encode_one_column():
     ])).all()
 
 
-def test_encode_two_columns():
-    model = MultiOneHotEncoder(['b', 'a'])
-
+def test_encode_one_column_drop_first():
+    model = MultiOneHotEncoder(['b'])
     transformed = model.fit_transform(data)
+    assert (transformed.columns.values == [
+        'a', 'c', 'b_0', 'b_1'
+    ]).all()
+    assert (transformed.values == np.array([
+        [1, 3, 0, 0],
+        [4, 6, 1, 0],
+        [7, 9, 0, 1],
+        [1, 9, 1, 0]
+    ])).all()
 
+
+def test_encode_two_columns():
+    model = MultiOneHotEncoder(['b', 'a'], drop=None)
+    transformed = model.fit_transform(data)
     assert (transformed.columns.values == [
         'c', 'b_0', 'b_1', 'b_2', 'a_0', 'a_1', 'a_2'
     ]).all()
-
     assert (transformed.values == np.array([
         [3, 1, 0, 0, 1, 0, 0],
         [6, 0, 1, 0, 0, 1, 0],
@@ -46,8 +54,22 @@ def test_encode_two_columns():
     ])).all()
 
 
+def test_encode_two_columns_drop_first():
+    model = MultiOneHotEncoder(['b', 'a'])
+    transformed = model.fit_transform(data)
+    assert (transformed.columns.values == [
+        'c', 'b_0', 'b_1', 'a_0', 'a_1'
+    ]).all()
+    assert (transformed.values == np.array([
+        [3, 0, 0, 0, 0],
+        [6, 1, 0, 1, 0],
+        [9, 0, 1, 0, 1],
+        [9, 1, 0, 0, 0]
+    ])).all()
+
+
 def test_encode_string():
-    model = MultiOneHotEncoder(['a'])
+    model = MultiOneHotEncoder(['a'], drop=None)
 
     transformed = model.fit_transform(data2)
 
@@ -70,7 +92,7 @@ def test_encode_string():
 
 
 def test_encode_missing_number():
-    model = MultiOneHotEncoder(['b'])
+    model = MultiOneHotEncoder(['b'], drop=None)
 
     transformed = model.fit_transform(data2)
 

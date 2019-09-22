@@ -111,14 +111,17 @@ class FeatureScaler(BaseModel):
 
 
 class MultiOneHotEncoder(BaseModel):
-    def __init__(self, features_to_encode):
+    def __init__(self, features_to_encode, drop='first'):
         self._features_to_encode = features_to_encode
+        self._drop = drop
         self._value_int_dict = dict()
         self._int_value_dict = dict()
 
     def fit(self, X):
         for feature in self._features_to_encode:
             unique_values = X[feature].unique()
+            if self._drop == 'first':
+                unique_values = unique_values[1:]
             self._int_value_dict[feature] = dict(
                 enumerate(unique_values))
             self._value_int_dict[feature] = dict(
