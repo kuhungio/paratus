@@ -79,7 +79,7 @@ class Autoencoder(BaseModel):
 
     def _input_layers(self, X):
         n_features = X.shape[1]
-        inputs = layers.Input(shape=(n_features,), name='autoencoder_input')
+        inputs = layers.Input(shape=(n_features,1), name='autoencoder_input')
         return inputs, inputs
 
     def _format_input(self, X):
